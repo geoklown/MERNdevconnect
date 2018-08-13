@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const gravatar = require('gravatar');
 //Load user medel
 const User = require('../../modules/User');
 // @route Get Request api/users/tes
@@ -20,6 +21,11 @@ router.post('/register', (req, res) => {
         email: 'Email Already Exists '
       });
     } else {
+      const avatar = grvatar.url(req.body.email, {
+        s: '200', // Size
+        r: 'pg', //Rating
+        d: 'mm' //default
+      });
       const newUser = new User({
         name: req.body.name,
         email: req.body.email,
