@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs')
 //Load user medel
 const User = require('../../modules/User');
 // @route Get Request api/users/tes
@@ -21,7 +22,7 @@ router.post('/register', (req, res) => {
         email: 'Email Already Exists '
       });
     } else {
-      const avatar = grvatar.url(req.body.email, {
+      const avatar = gravatar.url(req.body.email, {
         s: '200', // Size
         r: 'pg', //Rating
         d: 'mm' //default
@@ -30,9 +31,19 @@ router.post('/register', (req, res) => {
         name: req.body.name,
         email: req.body.email,
         avatar,
-        password: req.body.password
+        password: req.body.password,
+        date: req.body.genSalt
       });
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(newUser.password, salt, (err, hash) => {
+          if (err) throw err;
+          newUser.password = hash;
+          newUser.save()
+            .then(user => res.json(user))
+            .catch(err => console.log(err));
+        })
+      })
     }
-  })
+  });
 });
 module.exports = router;
