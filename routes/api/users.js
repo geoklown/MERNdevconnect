@@ -9,7 +9,7 @@ const passport = require('passport');
 const validateResgisterInput = require('../../validation/register');
 const validateLoginInput = require('../../validation/login');
 //Load user model
-const User = require('../../modules/User');
+const User = require('../../models/User');
 // @route Get Request api/users/tes
 // @desc Test users route
 // @access Public route
