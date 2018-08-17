@@ -93,7 +93,7 @@ router.post('/login', (req, res) => {
             id: user.id,
             name: user.name,
             avatar: user.avatar
-          } // create Jwt Payload
+          }; // create Jwt Payload
           // Sign Token
           jwt.sign(payload, keys.secretOrKey, {
             expiresIn: 3600
