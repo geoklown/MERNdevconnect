@@ -44,6 +44,26 @@ router.get(
       .catch(err => res.status(404).json(err));
   }
 );
+// @route GET Request api/profile/all
+// @desc Get all profiles
+// @access Public
+router.get('/all', (req, res) => {
+  const errors = {};
+  Profile.find()
+    .populate('user', ['name', 'avatar'])
+    .then(profiles => {
+      if (!profiles) {
+        errors.noprofile = 'There are no profiles';
+        return res.status(404).json(errors);
+      }
+      res.json(profiles);
+    })
+    .catch(err => res.status(404).json({
+      profile: 'There are no profiles'
+    }));
+});
+
+
 // @route GET Request api/profile/handle/:handle
 // @desc Get profile by handle
 // @access Public
