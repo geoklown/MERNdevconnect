@@ -112,7 +112,7 @@ router.post('/unlike/:id', passport.authenticate('jwt', {
         post.save().then(post => res.json(post));
       })
       .catch(err => res.status(404).json({
-        nopostfound: 'I don\t have that'
+        nopostfound: 'I don\t have that post'
       }));
   })
 });
