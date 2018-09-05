@@ -27,7 +27,10 @@ const PostSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: 'users'
     },
-
+    text: {
+      type: String,
+      required: false
+    },
     name: {
       type: String,
     },
@@ -37,7 +40,8 @@ const PostSchema = new Schema({
     date: {
       type: Date,
       default: Date.now
-    }
+    },
+
   }],
   date: {
     type: Date,

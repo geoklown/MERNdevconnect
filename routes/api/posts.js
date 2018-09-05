@@ -2,12 +2,14 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
+
 // Post Model
 const Post = require('../../models/Post');
 // Profile Model
 const Profile = require('../../models/Profile');
 // Post Validation
 const validatePostInput = require('../../validation/post');
+
 // @route Get Request api/post/tes
 // @desc Test Post route
 // @access Public route
@@ -43,9 +45,42 @@ router.get('/:id', (req, res) => {
       })
     );
 });
-// @route DELETE api/posts/:id
-// @desc delete Posts by Id
+
+// @route Post api/posts/:id
+// @desc create Posts by Id
 // @access Private
+
+router.post(
+  '/',
+  passport.authenticate('jwt', {
+    session: false
+  }),
+  (req, res) => {
+    const {
+      errors,
+      isValid
+    } = validatePostInput(req.body);
+
+    // Check Validation
+    if (!isValid) {
+      // If any errors, send 400 with errors object
+      return res.status(400).json(errors);
+    }
+
+    const newPost = new Post({
+      text: req.body.text,
+      name: req.body.name,
+      avatar: req.body.avatar,
+      user: req.user.id
+    });
+
+    newPost.save().then(post => res.json(post));
+  }
+);
+
+// @route   DELETE api/posts/:id
+// @desc    Delete post
+// @access  Private
 router.delete(
   '/:id',
   passport.authenticate('jwt', {
@@ -94,7 +129,7 @@ router.post(
         .then(post => {
           if (
             post.likes.filter(like => like.user.toString() === req.user.id)
-              .length > 0
+            .length > 0
           ) {
             return res.status(400).json({
               alreadyliked: 'User already liked this post'
@@ -114,7 +149,7 @@ router.post(
     });
   }
 );
-// @route Post Request api/posts/unlike/:id
+// @route Post api/posts/unlike/:id
 // @desc UnLike Post
 // @access Private
 router.post(
@@ -130,7 +165,7 @@ router.post(
         .then(post => {
           if (
             post.likes.filter(like => like.user.toString() === req.user.id)
-              .length == 0
+            .length === 0
           ) {
             return res.status(400).json({
               notliked: 'You have not liked this post yet'
@@ -153,39 +188,25 @@ router.post(
     });
   }
 );
-// @route Post Request api/posts
-// @desc Create Post
-// @access Private route
 
+// @route Post api/posts/comment/:id
+// @desc add comment to Post
+// @access Private
 router.post(
-  '/',
+  '/comment/:id',
   passport.authenticate('jwt', {
     session: false
   }),
   (req, res) => {
-    const { errors, isValid } = validatePostInput(req.body);
+    const {
+      errors,
+      isValid
+    } = validatePostInput(req.body);
     // Check Validation
     if (!isValid) {
       // If any errors send 400 with errors object
       return res.status(400).json(errors);
     }
-    const newPost = new Post({
-      text: req.body.text,
-      name: req.body.name,
-      avatar: req.body.avatar,
-      user: req.user.id
-    });
-    newPost.save().then(post => res.json(post));
-  }
-);
-// @route Post api/posts/comment/:id
-// @desc Add Comment to post
-// @access private
-
-router.post(
-  '/comment/:id',
-  passport.authenticate('jwt', { session: false }),
-  (req, res) => {
     Post.findById(req.params.id)
       .then(post => {
         const newComment = {
@@ -193,14 +214,18 @@ router.post(
           name: req.body.name,
           avatar: req.body.avatar,
           user: req.user.id
-        };
-        // add to comments array
+        }
+        // Add to comments array
         post.comments.unshift(newComment);
         // Save
-        post.save().then(post => res.json(post));
-      })
-      .catch(err => res.status(404).json({ postnotfound: 'No Post Found' }));
+        post.save().then(post => res.json(post))
+      }).catch(err => res.status(404).json({
+        postnotfound: 'No post found'
+      }));
+
   }
 );
+
+
 
 module.exports = router;
