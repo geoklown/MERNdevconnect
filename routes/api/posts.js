@@ -252,8 +252,14 @@ router.delete(
         post.comments.splice(removeIndex, 1);
         // Save
         post.save().then(post => res.json(post));
+<<<<<<< HEAD
       }).catch(err => res.status(404).json({
         postnotfound: 'No post found'
+=======
+      })
+      .catch(err => res.status(404).json({
+        nopostfound: 'I don\t have that post'
+>>>>>>> likes
       }));
 
   }
