@@ -102,14 +102,11 @@ router.delete(
           post.remove().then(() =>
             res.json({
               success: true
-            })
-          );
+            }));
         })
-        .catch(err =>
-          res.status(404).json({
-            nopostfound: 'I don\t have that'
-          })
-        );
+        .catch(err => res.status(404).json({
+          nopostfound: 'I don\t have that'
+        }));
     });
   }
 );
@@ -131,21 +128,22 @@ router.post(
             post.likes.filter(like => like.user.toString() === req.user.id)
             .length > 0
           ) {
-            return res.status(400).json({
-              alreadyliked: 'User already liked this post'
-            });
+            return res
+              .status(400)
+              .json({
+                alreadyliked: 'User already liked this post'
+              });
           }
+
           // Add user id to likes array
           post.likes.unshift({
             user: req.user.id
           });
           post.save().then(post => res.json(post));
         })
-        .catch(err =>
-          res.status(404).json({
-            nopostfound: 'I don\t have that'
-          })
-        );
+        .catch(err => res.status(404).json({
+          nopostfound: 'I don\t have that'
+        }));
     });
   }
 );
@@ -167,24 +165,27 @@ router.post(
             post.likes.filter(like => like.user.toString() === req.user.id)
             .length === 0
           ) {
-            return res.status(400).json({
-              notliked: 'You have not liked this post yet'
-            });
+            return res
+              .status(400)
+              .json({
+                notliked: 'You have not liked this post yet'
+              });
           }
+
           // Get remove index
           const removeIndex = post.likes
             .map(item => item.user.toString())
             .indexOf(req.user.id);
+
           // Splice out of array
           post.likes.splice(removeIndex, 1);
+
           // Save
           post.save().then(post => res.json(post));
         })
-        .catch(err =>
-          res.status(404).json({
-            nopostfound: 'I don\t have that'
-          })
-        );
+        .catch(err => res.status(404).json({
+          nopostfound: 'I don\t have that'
+        }));
     });
   }
 );
@@ -214,11 +215,43 @@ router.post(
           name: req.body.name,
           avatar: req.body.avatar,
           user: req.user.id
-        }
+        };
         // Add to comments array
         post.comments.unshift(newComment);
         // Save
         post.save().then(post => res.json(post))
+      }).catch(err => res.status(404).json({
+        postnotfound: 'No post found'
+      }));
+
+  }
+);
+// @route delete request api/posts/comment/:id/:comment_id
+// @desc remove comment from Post
+// @access Private
+router.delete(
+  '/comment/:id/:comment_id',
+  passport.authenticate('jwt', {
+    session: false
+  }),
+  (req, res) => {
+
+    Post.findById(req.params.id)
+      .then(post => {
+        // Check to see if comment exist
+        if (post.comments.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
+          return res.status(404).json({
+            commentnotexists: 'Comment does not exist'
+          });
+        }
+        // Ger remove index
+        const removeIndex = post.comments
+          .map(item => item.id.toString())
+          .indexOf(req.params.comment_id);
+        // Splice out of Array
+        post.comments.splice(removeIndex, 1);
+        // Save
+        post.save().then(post => res.json(post));
       }).catch(err => res.status(404).json({
         postnotfound: 'No post found'
       }));
