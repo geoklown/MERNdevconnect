@@ -4,6 +4,7 @@
     "devconnectordemo",
     "fsevents",
     "gravatar",
+    "homescreen",
     "johnj",
     "junkins",
     "mern",
@@ -13,6 +14,7 @@
     "notauthorized",
     "notliked",
     "notsup",
-    "postnotfound"
+    "postnotfound",
+    "webfonts"
   ]
 }

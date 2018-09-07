@@ -56,10 +56,7 @@ router.post(
     session: false
   }),
   (req, res) => {
-    const {
-      errors,
-      isValid
-    } = validatePostInput(req.body);
+    const { errors, isValid } = validatePostInput(req.body);
 
     // Check Validation
     if (!isValid) {
@@ -102,11 +99,14 @@ router.delete(
           post.remove().then(() =>
             res.json({
               success: true
-            }));
+            })
+          );
         })
-        .catch(err => res.status(404).json({
-          nopostfound: 'I don\t have that'
-        }));
+        .catch(err =>
+          res.status(404).json({
+            nopostfound: 'I don\t have that'
+          })
+        );
     });
   }
 );
@@ -126,13 +126,11 @@ router.post(
         .then(post => {
           if (
             post.likes.filter(like => like.user.toString() === req.user.id)
-            .length > 0
+              .length > 0
           ) {
-            return res
-              .status(400)
-              .json({
-                alreadyliked: 'User already liked this post'
-              });
+            return res.status(400).json({
+              alreadyliked: 'User already liked this post'
+            });
           }
 
           // Add user id to likes array
@@ -141,9 +139,11 @@ router.post(
           });
           post.save().then(post => res.json(post));
         })
-        .catch(err => res.status(404).json({
-          nopostfound: 'I don\t have that'
-        }));
+        .catch(err =>
+          res.status(404).json({
+            nopostfound: 'I don\t have that'
+          })
+        );
     });
   }
 );
@@ -163,13 +163,11 @@ router.post(
         .then(post => {
           if (
             post.likes.filter(like => like.user.toString() === req.user.id)
-            .length === 0
+              .length === 0
           ) {
-            return res
-              .status(400)
-              .json({
-                notliked: 'You have not liked this post yet'
-              });
+            return res.status(400).json({
+              notliked: 'You have not liked this post yet'
+            });
           }
 
           // Get remove index
@@ -183,9 +181,11 @@ router.post(
           // Save
           post.save().then(post => res.json(post));
         })
-        .catch(err => res.status(404).json({
-          nopostfound: 'I don\t have that'
-        }));
+        .catch(err =>
+          res.status(404).json({
+            nopostfound: 'I don\t have that'
+          })
+        );
     });
   }
 );
@@ -199,10 +199,7 @@ router.post(
     session: false
   }),
   (req, res) => {
-    const {
-      errors,
-      isValid
-    } = validatePostInput(req.body);
+    const { errors, isValid } = validatePostInput(req.body);
     // Check Validation
     if (!isValid) {
       // If any errors send 400 with errors object
@@ -219,11 +216,13 @@ router.post(
         // Add to comments array
         post.comments.unshift(newComment);
         // Save
-        post.save().then(post => res.json(post))
-      }).catch(err => res.status(404).json({
-        postnotfound: 'No post found'
-      }));
-
+        post.save().then(post => res.json(post));
+      })
+      .catch(err =>
+        res.status(404).json({
+          postnotfound: 'No post found'
+        })
+      );
   }
 );
 // @route delete request api/posts/comment/:id/:comment_id
@@ -235,11 +234,14 @@ router.delete(
     session: false
   }),
   (req, res) => {
-
     Post.findById(req.params.id)
       .then(post => {
         // Check to see if comment exist
-        if (post.comments.filter(comment => comment._id.toString() === req.params.comment_id).length === 0) {
+        if (
+          post.comments.filter(
+            comment => comment._id.toString() === req.params.comment_id
+          ).length === 0
+        ) {
           return res.status(404).json({
             commentnotexists: 'Comment does not exist'
           });
@@ -253,13 +255,12 @@ router.delete(
         // Save
         post.save().then(post => res.json(post));
       })
-      .catch(err => res.status(404).json({
-        nopostfound: 'I don\t have that post'
-      }));
-
+      .catch(err =>
+        res.status(404).json({
+          nopostfound: 'I don\t have that post'
+        })
+      );
   }
 );
-
-
 
 module.exports = router;
